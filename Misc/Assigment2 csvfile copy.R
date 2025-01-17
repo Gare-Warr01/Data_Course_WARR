@@ -1,0 +1,6 @@
+list.files(path= "/Users/garrett/Desktop/Data_Course_WARR/data", recursive = TRUE, pattern = ".csv")
+my_list <- list.files(path= "/Users/garrett/Desktop/Data_Course_WARR/data", recursive = TRUE, pattern = ".csv")
+length(csv_files)
+df <- read.csv("/Users/garrett/Desktop/Data_Course_WARR/data/wingspan_vs_mass.csv")
+head(df, n = 5)
+b_files <- list.files(path = "/Users/garrett/Desktop/Data_Course_WARR/data", pattern = "^b", recursive = TRUE)
