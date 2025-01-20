@@ -56,15 +56,15 @@ You will now be working in an RProject, meaning that all file paths will be self
 knitr::include_graphics("./rstudio_img1.png")
 ```
 
-2.  In RStudio, look at the lower right window and click on the "Files" tab.  You should be looking at all the files associated with this RProject. You can navigate through them just like any file explorer. Look in the "Data" directory to see a bunch of data files.
+2.  In RStudio, look at the lower right window and click on the "Files" tab.  You should be looking at all the files associated with this RProject. You can navigate through them just like any file explorer. Look in the "Data" directory to see a bunch of data files. # Done
 
-3.  Open a new Rscript (will appear in the top left window) || File > New File > R script
+3.  Open a new Rscript (will appear in the top left window) || File > New File > R script # Done 
 
-4.  Write a command that lists all of the .csv files found in the Data/ directory and stores that list in an object called "csv_files"
+4.  Write a command that lists all of the .csv files found in the Data/ directory and stores that list in an object called "csv_files" # Done 
 
-5.  Find how many files match that description using the length() function
+5.  Find how many files match that description using the length() function #Done
 
-6.  Open the wingspan_vs_mass.csv file and store the contents as an R object named "df" using the read.csv() function
+6.  Open the wingspan_vs_mass.csv file and store the contents as an R object named "df" using the read.csv() function #done
 
 7.  Inspect the first 5 lines of this data set using the head() function
 

@@ -25,6 +25,12 @@ as.numeric(c(x,y,100))
 z <-as.numeric(c(x,y,100))
 mean(z, na.rm = TRUE)
 head(csv_files,10)
+list.files(path = "Data", pattern = ".csv" , all.files =TRUE,
+           full.names = TRUE, recursive = TRUE, ignore.case = TRUE)
+length(csv_files)
+list.files(path = "Data", recursive = TRUE, pattern="wingspan_vs_mass.csv", full.names = TRUE)
+read.csv("wingspan_vs_mass.csv")
+
 
 bird <- list.files(path = "Data", recursive = TRUE, pattern="cleaned_bird_data.csv", full.names = TRUE)
 file.copy(bird, ".", overwrite = TRUE)
@@ -48,3 +54,27 @@ summary(dat$mass)
 summary(dat$tarsus)
 bigmassbuddies <- dat$mass > median(dat$mass, na.rm = TRUE) & dat$tarsus > median(dat$tarsus, na.rm = TRUE)
 plot(dat[bigmassbuddies, "Egg_mass"])
+getwd
+list.files
+list.files(path = "Data", pattern = ".csv" , all.files =TRUE,
+           full.names = TRUE, recursive = TRUE, ignore.case = TRUE)
+?dat
+# Loop through each .csv file in the csv_files list
+for (file in csv_files) {
+  first_line <- tryCatch({
+    read.csv(file, nrows = 1)
+  }, error = function(e) {
+    cat("Error reading file:", file, "\n")
+    return(NULL)
+  })
+  if (!is.null(first_line)) {
+    cat("First line of file:", file, "\n")
+    print(first_line)
+  }
+}
+
+for (file in csv_files) {
+  first_line <- read.csv(file, nrows = 1)
+  print(paste("First line of file:", file))
+  print(first_line)
+}
