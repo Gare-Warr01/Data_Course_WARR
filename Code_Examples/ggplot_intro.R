@@ -5,7 +5,7 @@ library(tidyverse)
 
 # Load the data we will work with (built-in to ggplot)
 data("midwest", package = "ggplot2")
-
+?midwest
 # Intro to ggplot syntax
 
 # The syntax for constructing ggplots could be puzzling if you are a beginner or work primarily with base graphics. 
@@ -89,15 +89,16 @@ p3 <- ggplot(midwest, aes(x=area, y=poptotal)) +
   labs(title="Area Vs Population", subtitle="From midwest dataset", y="Population", x="Area", caption="Midwest Demographics")
 p3
 
-# Don't like those colors?
+# Don't like those colors? A new asthetic with new color
 p3 + scale_color_brewer(palette = "Set1")
-
+p3 + scale_color_grey()
+p3 + scale_colour_viridis_d(option = "turbo", end=.8) 
 # Want more color choices? You can check them out in the RColorBrewer package, or even make your own
 library(RColorBrewer)
 brewer.pal.info
 
 # Make your own and take a peek at it:
-library(colorblindr)
+library(colorBlindness)
 pal = c("#c4a113","#c1593c","#643d91","#820616","#477887","#688e52",
         "#12aa91","#705f36","#8997b2","#753c2b","#3c3e44","#b3bf2d",
         "#82b2a4","#894e7d","#a17fc1","#262a8e","#abb5b5","#000000")
@@ -130,7 +131,7 @@ p4
 p4 + facet_wrap(~ state)
 p4 + facet_wrap(~ state, scales = "free") + theme(legend.position = "none")
 p4 + facet_wrap(~ state) + theme(legend.position = "none", strip.text.x = element_text(size = 12, face="bold"))
-p4 + facet_wrap(~ state) + theme(legend.position = "none", 
+p4 + facet_wrap(~ state, scales = "free") + theme(legend.position = "none", 
                                  strip.text.x = element_text(size = 12, face="bold"),
                                  strip.background = element_rect(fill = "lightblue"))
 
