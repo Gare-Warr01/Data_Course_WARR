@@ -1,0 +1,7 @@
+Final Project Idea: Predicting Influenza Strains Using Statistical Data
+
+My final project aims to look at how scientists determine which strain of influenza will be prevalent in a given year. By looking at historical influenza data, I can identify patterns and factors influencing the dominant strains.
+
+The Data and Where I am going to get it are below, 
+Data include the Year, Dominate strain, geographic area, mutation/genetic data, reported cases.
+Data from CDC and who, Epidemiology sites and public data
