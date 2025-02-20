@@ -1,0 +1,7 @@
+Maximum Horsepower Values:
+Original mtcars: 
+335
+Automatic Transmission Cars: 
+245
+Displacement ≤ 200 Cars: 
+175
