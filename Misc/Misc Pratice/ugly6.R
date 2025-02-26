@@ -14,12 +14,12 @@ ggplot(data, aes(x = "", y = value, fill = category)) +
   theme(
     panel.background = element_rect(fill = "green"), # Eye-searing green background
     panel.grid.major = element_line(color = "black", size = 5, linetype = "dashed"), # Thick, distracting grid lines
-    axis.text = element_text(size = 30, family = "Comic Sans MS", color = "cyan", angle = 90), # Slanted, unreadable text
-    axis.title = element_text(size = 40, family = "Papyrus", color = "orange", face = "italic", angle = 180), # Inverted, awful titles
-    plot.title = element_text(size = 50, family = "Wingdings", color = "black", face = "bold", angle = -90), # Unintelligible title
+    axis.text = element_text(size = 3, family = "Comic Sans MS", color = "cyan", angle = 90), # Slanted, unreadable text
+    axis.title = element_text(size = 3, family = "Papyrus", color = "orange", face = "italic", angle = 180), # Inverted, awful titles
+    plot.title = element_text(size = 3, family = "Wingdings", color = "black", face = "bold", angle = -90), # Unintelligible title
     legend.position = "bottom",
     legend.background = element_rect(fill = "hotpink"), # Clashing pink legend background
-    legend.text = element_text(size = 25, color = "purple", family = "Courier", angle = -45) # Tilted, chaotic legend text
+    legend.text = element_text(size = 3, color = "purple", family = "Courier", angle = -45) # Tilted, chaotic legend text
   ) +
   labs(title = "The Ultimate Pie Chart Disaster", x = "Unnecessary X Axis", y = "Horrific Y Axis")
 

@@ -1,3 +1,4 @@
+library(tidyverse)
 dir.create('./Figures')
 p1 <- 
 iris %>% 
@@ -38,3 +39,4 @@ table4b %>%
                values_to = 'Population',
                names_transform = as.numeric)
 full_join(table4c, table4d)
+
