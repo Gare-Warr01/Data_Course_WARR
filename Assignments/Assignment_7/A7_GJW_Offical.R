@@ -1,32 +1,32 @@
 # Load necessary libraries
 library(tidyverse)
 
-# ______________ STEP 1: IMPORT & CLEAN THE DATA ______________
+# STEP 1: IMPORT & CLEAN THE DATA
 # Read the dataset
 df <- read.csv("./Assignments/Assignment_7/Utah_Religions_by_County.csv", stringsAsFactors = FALSE)
 
-# Remove the "Religious" column (since it's redundant)
+# Remove the "Religious" column
 df <- df %>%
   select(-Religious)  
 
 # Check the structure of the cleaned dataset
 glimpse(df)
 
-# ______________ STEP 2: TRANSFORM TO TIDY FORMAT ______________
+# STEP 2: TIDY FORMAT
 df_tidy <- df %>%
-  pivot_longer(cols = -c(County, Pop_2010),   # Keep County & Population columns
+  pivot_longer(cols = -c(County, Pop_2010),  
                names_to = "Religion",
                values_to = "Proportion")
 
 # Clean column names
 df_tidy <- df_tidy %>%
   rename(county = County, population = Pop_2010, religion = Religion, proportion = Proportion) %>%
-  mutate(religion = str_replace_all(religion, "_", " "))  # Replace underscores with spaces
+  mutate(religion = str_replace_all(religion, "_", " "))
 
-# Check the transformed tidy data
+# transformed tidy data
 glimpse(df_tidy)
 
-# ______________ STEP 3: EXPLORE THE DATASET WITH FIGURES ______________
+# STEP 3: EXPLORE THE DATASET WITH FIGURES
 ## **Plot 1: Distribution of Religious Proportions Across Counties**
 ggplot(df_tidy, aes(x = proportion)) +
   geom_histogram(bins = 30, fill = "steelblue", color = "black") +
@@ -71,8 +71,10 @@ ggplot(df_selected, aes(x = LDS, y = Catholic)) +
   labs(title = "Scatter Plot: LDS vs. Catholic Proportion by County",
        x = "LDS Proportion", y = "Catholic Proportion")
 
+# STEP 5: SAVE THE CLEANED DATA 
+write.csv(df_tidy, "Utah_Religions_Tidy.csv", row.names = FALSE)
 
-# ______________ STEP 4: CORRELATION ANALYSIS ______________
+# STEP 4: CORRELATION ANALYSIS 
 
 ## **Question 1: Does Population Correlate with Any Religion?**
 # Compute correlations
@@ -88,9 +90,36 @@ ggplot(correlation_population, aes(x = reorder(religion, correlation), y = corre
        x = "Religious Group", y = "Correlation Coefficient")
 
 ## **Question 2: Does a Religion Correlate with Non-Religious Proportion?**
+# data sheet 
+religions <- read_csv("Utah_Religions_Tidy.csv")
 
+# Data
+religion_wide <- religions %>%
+  select(county, religion, proportion) %>%
+  pivot_wider(names_from = religion, values_from = proportion, values_fill = 0)
 
+# Correlation religions with Non.Religious
+cor_results <- religion_wide %>%
+  select(-county) %>%
+  cor(use = "pairwise.complete.obs")
 
-# ______________ STEP 5: SAVE THE CLEANED DATA ______________
-write.csv(df_tidy, "Utah_Religions_Tidy.csv", row.names = FALSE)
+# Extract correlations with Non.Religious
+non_rel_corr <- cor_results["Non.Religious", ] %>% sort()
 
+print(non_rel_corr)
+
+# Run regression: Non.Religious ~ LDS
+model <- lm(Non.Religious ~ LDS, data = religion_wide)
+
+# Summary of the regression model
+summary(model)
+
+ggplot(religion_wide, aes(x = LDS, y = Non.Religious)) +
+  geom_point(color = "darkred") +
+  geom_smooth(method = "lm", se = TRUE, color = "black") +
+  labs(
+    title = "LDS Proportion vs Non-Religious Proportion",
+    x = "LDS Proportion",
+    y = "Non-Religious Proportion"
+  ) +
+  theme_minimal()
