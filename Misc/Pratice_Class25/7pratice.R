@@ -3,7 +3,7 @@ library(tidyverse)
 
 # ______________ STEP 1: IMPORT DATA ______________
 # Read in the dataset
-df <- read.csv("./Assignments:Exams/Assignment_7/Utah_Religions_by_County.csv", stringsAsFactors = FALSE)
+df <- read.csv("./Assignments/Assignment_7/Utah_Religions_by_County.csv", stringsAsFactors = FALSE)
 
 # Inspect the data structure
 glimpse(df)
@@ -63,3 +63,4 @@ ggplot(correlation_population, aes(x = reorder(religion, correlation), y = corre
 
 #______________ STEP 5: SAVE THE CLEANED DATA ______________
 write.csv(df_tidy, "Utah_Religions_Tidy.csv", row.names = FALSE)
+

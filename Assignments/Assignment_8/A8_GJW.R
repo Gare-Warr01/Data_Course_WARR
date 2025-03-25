@@ -42,3 +42,20 @@ print(mse_results)
 # 5. Select best model (lowest MSE)
 best_model <- model4
 
+# 6. Make predictions with hypothetical new data
+new_data <- expand.grid(
+  Light = seq(min(data$Light), max(data$Light), length.out = 50),
+  Humidity = unique(data$Humidity),
+  Temperature = mean(data$Temperature, na.rm = TRUE),
+  Species = data$Species[1]
+)
+new_data$PredictedGrowthRate <- predict(best_model, new_data)
+
+# 7. Plot predictions alongside real data
+ggplot(data, aes(x = Light, y = GrowthRate, color = Humidity)) + 
+  geom_point(alpha = 0.6) + 
+  geom_line(data = new_data, aes(x = Light, y = PredictedGrowthRate, color = Humidity), size = 1) +
+  ggtitle("Predicted vs Actual Mushroom Growth Rate by Humidity") +
+  labs(x = "Light", y = "Growth Rate") +
+  theme_minimal()
+
