@@ -1,61 +1,90 @@
-# Assignment 8 - Mushroom Growth Modeling
-
-# Load required libraries
+# Load packages ---------------------------
 library(tidyverse)
-library(caret)
+
+# Load data ---------------------------
+mushrooms <- read_csv("./Data/mushroom_growth.csv")
+
+# Explore data ---------------------------
+glimpse(mushrooms)
+
+# Plot numeric predictors vs GrowthRate ---------------------------
+
+# Identify numeric columns excluding the response
+numeric_predictors <- mushrooms %>% 
+  select(where(is.numeric), -GrowthRate) %>% 
+  names()
+
+# Pivot only numeric columns
+mushrooms %>% 
+  select(GrowthRate, all_of(numeric_predictors)) %>% 
+  pivot_longer(!GrowthRate, names_to = "variable", values_to = "value") %>% 
+  ggplot(aes(x = value, y = GrowthRate)) +
+  geom_point(alpha = 0.6) +
+  facet_wrap(~ variable, scales = "free_x") +
+  theme_minimal() +
+  labs(title = "Numeric Predictors vs GrowthRate")
 
 
-# 1. Load the dataset
-data <- read_csv("Data/mushroom_growth.csv")
+# Define models ---------------------------
 
-# 2. Explore the data with plots
-glimpse(data)
-summary(data)
+# Model 1: Simple linear on Light
+model_1 <- lm(GrowthRate ~ Light, data = mushrooms)
 
-# Scatter plots
-ggplot(data, aes(x = Light, y = GrowthRate)) + geom_point() + geom_smooth(method = "lm") + ggtitle("GrowthRate vs Light")
-ggplot(data, aes(x = Humidity, y = GrowthRate)) + geom_point() + geom_smooth(method = "lm") + ggtitle("GrowthRate vs Humidity")
-ggplot(data, aes(x = Temperature, y = GrowthRate)) + geom_point() + geom_smooth(method = "lm") + ggtitle("GrowthRate vs Temperature")
-ggplot(data, aes(x = Species, y = GrowthRate)) + geom_boxplot() + ggtitle("GrowthRate vs Species")
+# Model 2: Add Temperature
+model_2 <- lm(GrowthRate ~ Light + Temperature, data = mushrooms)
 
-# 3. Define models
-model1 <- lm(GrowthRate ~ Light, data = data)
-model2 <- lm(GrowthRate ~ Light + Humidity, data = data)
-model3 <- lm(GrowthRate ~ Light + Humidity + Temperature, data = data)
-model4 <- lm(GrowthRate ~ Light + Humidity + Temperature + Species, data = data)
+# Model 3: Add Humidity
+model_3 <- lm(GrowthRate ~ Light + Temperature + Humidity, data = mushrooms)
 
-# 4. Calculate mean squared errors
-mse <- function(model) mean(resid(model)^2)
+# Model 4: All predictors + interaction
+model_4 <- lm(GrowthRate ~ Light * Temperature + Humidity  + Nitrogen, data = mushrooms)
 
-mse1 <- mse(model1)
-mse2 <- mse(model2)
-mse3 <- mse(model3)
-mse4 <- mse(model4)
+# MSE calculation function ---------------------------
+calculate_mse <- function(model, data) {
+  mean((data$GrowthRate - predict(model, newdata = data))^2)
+}
+
+# Calculate MSE for each model ---------------------------
+mse_1 <- calculate_mse(model_1, mushrooms)
+mse_2 <- calculate_mse(model_2, mushrooms)
+mse_3 <- calculate_mse(model_3, mushrooms)
+mse_4 <- calculate_mse(model_4, mushrooms)
 
 mse_results <- tibble(
-  Model = c("Light only", "Light + Humidity", "Light + Humidity + Temp", "All Predictors"),
-  MSE = c(mse1, mse2, mse3, mse4)
+  model = c("Model 1", "Model 2", "Model 3", "Model 4"),
+  mse = c(mse_1, mse_2, mse_3, mse_4)
 )
 
 print(mse_results)
 
-# 5. Select best model (lowest MSE)
-best_model <- model4
+# Select best model ---------------------------
+best_model <- model_4  # Assuming lowest MSE
+formula(best_model)
 
-# 6. Make predictions with hypothetical new data
-new_data <- expand.grid(
-  Light = seq(min(data$Light), max(data$Light), length.out = 50),
-  Humidity = unique(data$Humidity),
-  Temperature = mean(data$Temperature, na.rm = TRUE),
-  Species = data$Species[1]
+# New hypothetical data ---------------------------
+new_data <- tibble(
+  Light = c(10, 20, 0),
+  Temperature = c(20, 25, 30),
+  Humidity = c('Low', 'Low', 'High'),
+  Nitrogen = c(5, 6, 7)
 )
-new_data$PredictedGrowthRate <- predict(best_model, new_data)
 
-# 7. Plot predictions alongside real data
-ggplot(data, aes(x = Light, y = GrowthRate, color = Humidity)) + 
-  geom_point(alpha = 0.6) + 
-  geom_line(data = new_data, aes(x = Light, y = PredictedGrowthRate, color = Humidity), size = 1) +
-  ggtitle("Predicted vs Actual Mushroom Growth Rate by Humidity") +
-  labs(x = "Light", y = "Growth Rate") +
+new_data$GrowthRate <- predict(model_4, new_data)
+new_data$Type <- "Predicted"
+
+print(new_data)
+
+
+# Plot predictions vs actual ---------------------------
+mushrooms$Type <- "Observed"
+
+# Combine for plotting
+combined_data <- rbind(
+  mushrooms[, c("Light", "GrowthRate", 'Humidity', 'Nitrogen', 'Type')],
+  new_data[, c("Light", "GrowthRate", 'Humidity', 'Nitrogen', 'Type')])
+ 
+
+ggplot(combined_data, aes(x = Light, y = GrowthRate, color = Type, shape = Type)) +
+  geom_point(size = 3) +
+  ggtitle("Observed vs Predicted Growth Rate by Light") +
   theme_minimal()
-

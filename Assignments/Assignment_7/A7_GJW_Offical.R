@@ -123,3 +123,4 @@ ggplot(religion_wide, aes(x = LDS, y = Non.Religious)) +
     y = "Non-Religious Proportion"
   ) +
   theme_minimal()
+
