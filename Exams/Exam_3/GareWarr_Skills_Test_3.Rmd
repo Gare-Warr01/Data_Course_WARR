@@ -1,0 +1,118 @@
+---
+title: "GAREWARR_Skills_Test_3"
+author: "Garrett Warr"
+output: html_document
+---
+
+```{r setup, include=TRUE}
+library(tidyverse)
+library(broom)
+```
+
+# Task 1: Tidy Faculty Salaries and Recreate Plot
+
+```{r tidy-salaries}
+# Load data
+faculty <- read_csv("FacultySalaries_1995.csv")
+
+# Tidy data
+salary_long <- faculty %>%
+  select(State, Tier, 
+         Assist = AvgAssistProfSalary, 
+         Assoc = AvgAssocProfSalary, 
+         Full = AvgFullProfSalary) %>%
+  pivot_longer(cols = c(Assist, Assoc, Full), 
+               names_to = "Rank", 
+               values_to = "Salary")
+```
+
+```{r plot-salaries}
+# Filter out only the valid Tiers: I, IIA, IIB (exclude VIIB)
+salary_filtered <- salary_long %>%
+  filter(Tier %in% c("I", "IIA", "IIB"))
+
+# Create the final plot
+ggplot(salary_filtered, aes(x = Rank, y = Salary, fill = Rank)) +
+  geom_boxplot() +
+  facet_grid(~ Tier, switch = "x") +
+  scale_fill_manual(values = c(
+    "Assist" = "#F8766D", 
+    "Assoc"  = "#00BA38", 
+    "Full"   = "#619CFF"  
+  )) +
+  theme_minimal(base_size = 14) +
+  theme(
+    strip.placement = "outside",
+    strip.background = element_blank(),
+    strip.text.x = element_text(size = 14, vjust = 0),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid.major.x = element_blank(),
+    legend.position = "right"
+  ) +
+  labs(
+    x = "Rank",
+    y = "Salary"
+  )
+
+
+```
+
+# Task 2: ANOVA Model
+
+```{r anova-model}
+# ANOVA without interaction terms
+anova_model <- aov(Salary ~ State + Tier + Rank, data = salary_long)
+summary(anova_model)
+
+```
+
+# Task 3: Tidy Juniper Oils Data
+
+```{r tidy-juniper}
+# Load Juniper Oils dataset
+juniper <- read_csv("Juniper_Oils.csv")
+
+# List of compounds
+compounds <- c("alpha-pinene","para-cymene","alpha-terpineol","cedr-9-ene","alpha-cedrene",
+               "beta-cedrene","cis-thujopsene","alpha-himachalene","beta-chamigrene",
+               "cuparene","compound 1","alpha-chamigrene","widdrol","cedrol","beta-acorenol",
+               "alpha-acorenol","gamma-eudesmol","beta-eudesmol","alpha-eudesmol",
+               "cedr-8-en-13-ol","cedr-8-en-15-ol","compound 2","thujopsenal")
+
+# Tidy data
+juniper_long <- juniper %>%
+  select(YearsSinceBurn, all_of(compounds)) %>%
+  pivot_longer(cols = -YearsSinceBurn, 
+               names_to = "ChemicalID", 
+               values_to = "Concentration")
+```
+
+# Task 4: Plot Concentration Trends
+
+```{r plot-compounds}
+# Faceted plot of compound concentration trends
+ggplot(juniper_long, aes(x = YearsSinceBurn, y = Concentration)) +
+  geom_smooth(method = "loess", se = TRUE, color = "blue") +
+  facet_wrap(~ ChemicalID, scales = "free_y") +
+  theme_minimal() +
+  labs(x = "YearsSinceBurn", y = "Concentration")
+```
+# Task 5: GLM for Chemical Trends
+
+```{r glm-analysis}
+# Safe GLM per chemical with relaxed significance filter to match example output
+glm_results <- juniper_long %>%
+  group_by(ChemicalID) %>%
+  nest() %>%
+  mutate(
+    model = map(data, ~ lm(Concentration ~ YearsSinceBurn, data = na.omit(.x))),
+    tidied = map(model, tidy)
+  ) %>%
+  unnest(tidied) %>%
+  filter(term == "YearsSinceBurn", p.value < 0.05) %>%  # Relaxed threshold
+  select(ChemicalID, estimate, std.error, statistic, p.value) %>%
+  rename(term = ChemicalID)
+
+# Display significant results
+glm_results
+```
